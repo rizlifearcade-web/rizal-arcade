@@ -1,0 +1,108 @@
+# Rizal Arcade
+
+**History you can play.** Rizal Arcade is a mobile-friendly educational game portal about José Rizal’s life, novels, writings, civic ideas, and historical world.
+
+The classroom edition takes the familiar pick-and-play feel of Friv or Y8 and gives it a distinctly Filipino “historical arcade” identity for college Rizal Life classes. Official roster accounts connect each two-to-five-minute round to the correct student and section, while every answer still opens a short explanation plus a source.
+
+## Playable games
+
+- **Rizal River Quest** — move a frog along a six-jump river route by choosing the value that best fits each modern scenario. Wrong answers cost a life and do not advance the frog. Every mapping is clearly labeled as an interpretation.
+- **Novel Case Files** — play a 12-card memory game that pairs clearly labeled artistic character portraits and specific clues with names from *Noli Me Tángere* and *El Filibusterismo*.
+- **Rizal Codebreaker** — manually decode an Atbash substitution cipher with the supplied alphabet key, then file the archive slip into the correct drawer.
+- **Scholar’s Journey** — study six records along Rizal’s academic route, pack them into a passport tray, then stamp each record at its remembered learning station. Correct placements move the Rizal traveller forward.
+- **Hearts & Horizons** — inspect a portrait dossier, match the woman to the evidence and place in Rizal’s journey, then seal and send the correspondence.
+- **Masterpiece Museum** — inspect six exhibits and decide whether each proposed label is supported by the archive evidence. Confirm the inspection, then read the accurate interpretation and source.
+- **Global Sojourn — Chart the Journey** — decode travel telegrams and draw Rizal’s routes across an interactive world atlas.
+- **Dapitan to Bagumbayan** — classify, verify, and reconstruct archive records from Rizal’s exile through his final journey.
+- **El Fili: Revolution Files** — reconstruct causal chains from *El Filibusterismo* on a gaslit evidence table while managing exposure and limited lamplight clues.
+- **Rizal & the Nation: Crossword Chronicle** — complete randomized, connected newspaper crosswords about the Rizal Law, historical context, heroism, and national consciousness.
+
+All ten games include optional sound. Scholar’s Journey adds a licensed page-turn recording; Revolution Files layers a locally hosted investigation score beneath an exposure-responsive ambient drone and custom action cues; other games combine synthesized cues with locally hosted music. Nothing is downloaded from an external audio service while students play.
+
+## Classroom safeguards
+
+- Facts and explanations link to primary texts, public-domain translations, or National Historical Commission of the Philippines markers.
+- Interpretive claims are labeled instead of presented as direct quotations or uncontested facts.
+- Alternate spellings and common translated titles are accepted in the codebreaker.
+- Memory clues name the relevant person, relationship, and event directly instead of relying on unclear pronouns.
+- A Rizal Life instructor should review wording, translations, and interpretations before formal classroom release.
+
+## Local development
+
+Requires Node.js 22.13 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+Validate the production build with:
+
+```bash
+npm test
+```
+
+For Vercel, import the repository as a project. The included `vercel.json` uses the dedicated static build:
+
+```bash
+npm run build:vercel
+```
+
+The generated site is written to `vercel-dist/`. The public landing page builds without environment variables, but student sign-in, roster import, score saving, and leaderboards require the Supabase configuration below.
+
+## Classroom accounts and section leaderboards with Supabase
+
+The site can reuse an existing Supabase project; a second project is not required.
+
+For an existing classroom database, run `supabase/repair_score_recording.sql` to enable all ten games, including Dapitan and El Fili. This transactional migration preserves existing accounts and scores. Do not rerun the initial schema or older game migrations on a live classroom database: the initial schema deletes scores, and older migrations replace the supported game list.
+
+1. Open the Supabase SQL Editor and run [`supabase/rizal_arcade_scores.sql`](supabase/rizal_arcade_scores.sql). This replaces the old prototype nickname leaderboard and removes its unverified scores.
+2. In Supabase Authentication, create the single administrator as an email/password user.
+3. In the SQL Editor, promote that user with `select public.promote_rizal_arcade_admin('professor@school.edu', 'Professor');`, replacing both values.
+4. Copy `.env.example` to `.env.local` for local development.
+5. Set the browser-safe `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` values.
+6. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for the protected roster-import functions.
+7. Add all four variables to the Vercel project. Mark `SUPABASE_SERVICE_ROLE_KEY` as sensitive, keep it server-only, and redeploy.
+
+The browser receives only the public publishable key. The service-role key exists only inside Vercel Functions and must never use the `VITE_` prefix. The protected import endpoint verifies the signed-in administrator before it creates accounts. Students sign in with Student ID plus a temporary password, change that password on first use, and can read only their assigned section’s scores through row-level security.
+
+Uploading the same section again updates matching Student IDs without resetting their passwords. Newly created credentials are returned once for CSV download. Password resets generate a fresh temporary password and require another first-login change.
+
+Individual student records can also be managed from **Admin desk → Section rosters**. Administrators may add a late enrollee and receive a one-time temporary credential, edit names, course, email, Student ID, or section without resetting the password, and deactivate or reactivate access. Student ID changes update the sign-in identity, while name and section corrections keep leaderboard records aligned. Permanent deletion is reserved for confirmed mistakes and requires typing the exact Student ID; it removes the student's Auth user, profile, scores, and badges through the existing cascade rules.
+
+### Semester archive and reset
+
+The administrator can download the current data for any imported school year and term at any time from **Admin desk → Semester closeout**. Each ZIP contains a readable Excel workbook, a complete JSON restoration copy, and a manifest with record counts and a SHA-256 checksum. Passwords and server secrets are never included.
+
+To enable the destructive closeout action, run [`supabase/add_semester_closeout.sql`](supabase/add_semester_closeout.sql) once in the Supabase SQL Editor. The migration is additive: it creates a small audit table and a service-role-only transaction that removes only the selected semester's student Auth users, profiles, scores, badges, and now-empty sections. Administrator accounts and other semesters remain intact.
+
+Closing a semester requires a freshly downloaded archive, an acknowledgement, and the displayed confirmation phrase. The download receipt expires after 30 minutes. If the roster, scores, or badges change after download, the closeout is refused until a new archive is generated. A successful closeout retains only a lightweight audit record with the administrator, timestamp, checksum, and deleted record counts.
+
+The board is intended for friendly classroom play. Because each game runs in the student’s browser, score ranges and identity are validated but gameplay is not cheat-proof; add server-verified rounds before attaching grades or prizes to rankings.
+
+## Technology
+
+React 19, TypeScript, Tailwind CSS, vinext, Vercel Functions, and Supabase Auth/Postgres. The classroom edition has no ads or tracking.
+
+## Visual archive
+
+The arcade uses locally hosted public-domain or CC0 historical visuals, including an 1883 portrait of Rizal, an image of him at eighteen, Madrid university buildings, an 1898 Manila map, a historic *Noli Me Tangere* cover, a handwritten Rizal letter, and period poster art. Full source and license notes are in [`ASSET_CREDITS.md`](ASSET_CREDITS.md).
+
+## Core references
+
+- [NHCP Registry: José Rizal](https://philhistoricsites.nhcp.gov.ph/registry_database/jose-rizal-1861-1896-9/)
+- [*Noli Me Tangere* / *The Social Cancer*](https://www.gutenberg.org/ebooks/6737)
+- [*El Filibusterismo* / *The Reign of Greed*](https://www.gutenberg.org/ebooks/10676)
+- [Letter to the Young Women of Malolos](https://www.gutenberg.org/ebooks/17116)
+- [*The Indolence of the Filipino*](https://www.gutenberg.org/ebooks/6885)
+- [*The Philippines a Century Hence*](https://www.gutenberg.org/ebooks/35899)
+- [Museo ni Rizal](https://intramuros.gov.ph/mnr/)
+- [National Museum: Dr. José Rizal Hall](https://www.nationalmuseum.gov.ph/exhibitions/fine-arts/galley-5/)
+- [NHCP Registry: La Liga Filipina](https://philhistoricsites.nhcp.gov.ph/registry_database/la-liga-filipina/)
+
+This is an educational prototype, not an official publication of the NHCP or any school.
+# Completion badges
+
+The badge collection recognizes completed rounds saved to each student's Supabase account. See [game badge setup and testing](docs/game-badges.md) for the additive migration, award rules, and test-branch instructions.

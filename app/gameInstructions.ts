@@ -1,0 +1,133 @@
+export type InstructionGameId = "values" | "novels" | "codebreaker" | "scholar" | "hearts" | "museum" | "global" | "dapitan" | "revolution" | "crossword";
+
+export type GameInstruction = {
+  title: string;
+  topic: string;
+  goal: string;
+  steps: [string, string, string];
+  scoring: string;
+  tip: string;
+};
+
+export const gameInstructions: Record<InstructionGameId, GameInstruction> = {
+  values: {
+    title: "Rizalian Values: River Quest",
+    topic: "Rizal’s values and their relevance in modern life",
+    goal: "Help the frog reach the finish line by choosing the Rizalian value that best fits each modern-day situation.",
+    steps: [
+      "Read the situation shown above the river.",
+      "Choose one of the three labeled lily pads.",
+      "A correct answer moves the frog forward. A wrong answer costs one life and the frog stays in place.",
+    ],
+    scoring: "Reach six correct jumps before all three lives are lost. Correct streaks increase the score.",
+    tip: "Read the short explanation after every jump—it tells you why the value fits.",
+  },
+  novels: {
+    title: "Noli Case Files",
+    topic: "Characters, plot, and themes from Noli Me Tangere",
+    goal: "Clear the archive by matching six visual clue cards with their correct character, event, or theme cards.",
+    steps: [
+      "Open one face-down card and study its clue or answer.",
+      "Open a second card that you think belongs to the same case file.",
+      "A matching pair stays open. A wrong pair turns face down so you can try again.",
+    ],
+    scoring: "Find all six pairs. Consecutive correct matches build a score streak; the Moves counter records each pair attempted.",
+    tip: "A valid pair always contains one clue card and one answer card—not two clues or two answers.",
+  },
+  codebreaker: {
+    title: "Rizal Roots: Codebreaker",
+    topic: "Rizal’s family, childhood, genealogy, and early education",
+    goal: "Manually decode six Atbash transmissions, then place each solved Rizal record in the correct archive drawer.",
+    steps: [
+      "Use the displayed alphabet key: A becomes Z, B becomes Y, C becomes X, and so on.",
+      "Type the complete decoded answer and check it.",
+      "Pick up the solved archive slip, then file it under Family & Roots, Childhood, or Early Education.",
+    ],
+    scoring: "Correct decoding and filing earn points. Opening extra clues helps, but each additional clue reduces the available score.",
+    tip: "Decode every letter yourself—the encrypted word is not solved by repeatedly clicking a wheel.",
+  },
+  scholar: {
+    title: "Scholar’s Journey",
+    topic: "Rizal’s higher education and scholarly formation",
+    goal: "Study six academic records for twenty seconds, then rebuild Rizal’s educational journey from memory.",
+    steps: [
+      "During Study Route, memorize the record attached to each place.",
+      "When the records move to the passport tray, select one record.",
+      "Stamp the selected record at the journey stop where you remember seeing it.",
+    ],
+    scoring: "Correct placements move the traveller and build a streak. A wrong stop costs one of four lives.",
+    tip: "You may press “Pack the records” before the twenty seconds end when you are ready.",
+  },
+  hearts: {
+    title: "Hearts & Horizons",
+    topic: "Rizal’s documented relationships and the women he met",
+    goal: "Use each anonymous three-clue dossier to identify the woman and connect her with the correct place in Rizal’s journey.",
+    steps: [
+      "Read all three pieces of written evidence in the dossier.",
+      "Choose an identity seal, then choose the journey postmark. On a phone, the next choice opens automatically.",
+      "Press Seal & Send after both choices are selected.",
+    ],
+    scoring: "Complete six dossiers. A wrong identity, place, or both costs one of four lives; correct streaks earn bonus points.",
+    tip: "Some portraits are artistic interpretations. Trust the written historical evidence, not appearance alone.",
+  },
+  museum: {
+    title: "Masterpiece Museum",
+    topic: "Rizal’s essays, letters, annotations, poems, plays, and visual art",
+    goal: "Inspect six museum exhibits and catch labels that misrepresent Rizal’s works by checking each claim against the archive evidence.",
+    steps: [
+      "Inspect the artifact title, date, object type, and three evidence clues.",
+      "Read the proposed plaque. Choose Keep the label if the evidence supports it, or Replace the label if it changes the history.",
+      "Press Confirm inspection, then read the accurate label and explanation before moving to the next exhibit.",
+    ],
+    scoring: "Inspect six exhibits with four lives. A wrong inspection costs one life and reveals the correction; correct streaks earn bonus points.",
+    tip: "Watch for labels that distort a work’s purpose or confuse its author. Read all three clues before deciding.",
+  },
+  global: {
+    title: "Global Sojourn — Chart the Journey",
+    topic: "Rizal’s international travels, reform work, medical training, and publications abroad",
+    goal: "Build an eight-stop world journey by drawing each route from Rizal’s traveler token to the port identified by a historical telegram.",
+    steps: [
+      "Read the period, mission, and all three clues in the incoming telegram below the map.",
+      "Drag Rizal’s ship from its current position to a glowing destination port. You may also tap a port or press 1, 2, or 3.",
+      "A correct route sails across the map and stamps the city. A wrong route is crossed out and punches one travel permit.",
+    ],
+    scoring: "Chart eight randomized routes before all four travel permits are punched. Correct streaks and first-try navigation earn bonus points.",
+    tip: "Do not rely on geography alone. Connect the dates, people, publications, institutions, and events in all three clues.",
+  },
+  dapitan: {
+    title: "Dapitan to Bagumbayan",
+    topic: "Rizal’s persecution, exile, trial, execution, and legacy",
+    goal: "Reconstruct Rizal’s final years by filing each historical record under the correct timeline stage, evidence category, or Rizalian theme.",
+    steps: [
+      "Read the archive card and note whether it is a Timeline File, Evidence Check, or Rizalian Theme.",
+      "Select the classification that best fits the record. On a phone, tap an answer; on desktop, use the railway controls or number keys.",
+      "Press Confirm answer (or load the selected cargo on desktop), then read the explanation. Releasing a lever never submits an answer.",
+    ],
+    scoring: "Classify ten randomized files. Each correct answer earns 100 points, while consecutive correct answers add a streak bonus.",
+    tip: "For Evidence Check files, distinguish carefully between claims the module supports, debates, or contradicts.",
+  },
+  revolution: {
+    title: "El Fili: Revolution Files",
+    topic: "El Filibusterismo: characters, plot, blocked reform, revolution, and national awakening",
+    goal: "Reconstruct six causal chains from the novel by threading evidence from its starting position through pressure, decisive action, and consequence.",
+    steps: [
+      "Inspect the loose evidence, select or drag a fragment, then pin it into one of the four numbered thread positions.",
+      "Fill the complete chain and test it; correct links lock in place while false links fall away and increase colonial exposure.",
+      "Spend one of three lamplight clues to reveal a thread when needed, then read the debrief before unsealing the next file.",
+    ],
+    scoring: "Resolve six randomized files before four failed chain tests expose the operation. Clean chains and streaks earn bonus points; lamplight costs 20 points.",
+    tip: "Build a sequence, not a list of facts: ask what creates pressure, which action follows, and what consequence that action produces.",
+  },
+  crossword: {
+    title: "Rizal & the Nation: Crossword Chronicle",
+    topic: "The Rizal Law, nineteenth-century society, Rizalian heroism, and Filipino national consciousness",
+    goal: "Complete an eight-word newspaper crossword by using course evidence and the letters created where answers intersect.",
+    steps: [
+      "Choose an Across or Down clue from the compositor’s desk; its cells will light up on the printing form.",
+      "Type the complete answer using solved crossing letters to test what fits. Multi-word answers display a visible space, which the game inserts for you.",
+      "Solve all eight entries before five incorrect checks use up the press’s ink; each round draws from fifty clues and builds a new grid.",
+    ],
+    scoring: "A correct word earns 100 points plus a streak bonus. A wrong check uses one of five ink ribbons; five letter reveals are available and each costs 10 points.",
+    tip: "The whole puzzle fits on a phone. Use Enlarge puzzle for bigger cells, or Browse all clues to select a clue without tapping the grid.",
+  },
+};
