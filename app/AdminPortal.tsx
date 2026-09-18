@@ -45,6 +45,12 @@ const games: Array<{ id: LeaderboardGame; label: string }> = [
   { id: "novels", label: "Noli Case Files" },
   { id: "codebreaker", label: "Codebreaker" },
   { id: "scholar", label: "Scholar’s Journey" },
+  { id: "hearts", label: "Hearts & Horizons" },
+  { id: "museum", label: "Masterpiece Museum" },
+  { id: "global", label: "Global Sojourn" },
+  { id: "dapitan", label: "Dapitan to Bagumbayan" },
+  { id: "revolution", label: "El Fili: Revolution Files" },
+  { id: "crossword", label: "Crossword Chronicle" },
 ];
 
 const adminTabs: Array<{ id: Tab; label: string }> = [
