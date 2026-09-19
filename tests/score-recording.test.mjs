@@ -109,6 +109,9 @@ test("every registered game is supported by the repair and fresh schema", () => 
   const registry = readFileSync(new URL("../app/games/registry.tsx", import.meta.url), "utf8");
   const games = [...registry.matchAll(/id: "([a-z]+)"/g)].map((match) => match[1]);
   assert.equal(games.length, 10);
+  const admin = readFileSync(new URL("../app/AdminPortal.tsx", import.meta.url), "utf8");
+  const adminGames = [...admin.slice(admin.indexOf("const games:"), admin.indexOf("const adminTabs:")).matchAll(/id: "([a-z]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(adminGames, games, "the admin leaderboard must offer every playable game in order");
   for (const file of ["repair_score_recording.sql", "rizal_arcade_scores.sql"]) {
     const sql = readFileSync(new URL(`../supabase/${file}`, import.meta.url), "utf8");
     for (const game of games) {
