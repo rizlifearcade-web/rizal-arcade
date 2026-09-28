@@ -211,6 +211,7 @@ footer button { border: 0; padding: 0; background: transparent; color: inherit; 
 
 /* Game overlays */
 .game-overlay { position: fixed; z-index: 100; inset: 0; overflow-y: auto; background: var(--paper); color: var(--ink); animation: page-in .28s ease-out both; }
+.game-overlay.is-playing.is-showing-results { overflow-y: auto; }
 @keyframes page-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .game-header { position: sticky; z-index: 15; top: 0; height: 74px; display: grid; grid-template-columns: 52px 1fr auto; gap: 16px; align-items: center; padding: 0 clamp(18px, 4vw, 58px); border-bottom: 1px solid var(--rule); background: rgba(243,236,221,.94); backdrop-filter: blur(12px); }
 .game-header.has-status { padding-bottom: 24px; }

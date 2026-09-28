@@ -219,8 +219,11 @@ export function Results({ game, title, score, best, maxScore, onReplay, onClose 
   const resultsRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    resultsRef.current?.closest<HTMLElement>(".game-overlay")?.scrollTo({ top: 0, behavior: "auto" });
+    const overlay = resultsRef.current?.closest<HTMLElement>(".game-overlay");
+    overlay?.classList.add("is-showing-results");
+    overlay?.scrollTo({ top: 0, behavior: "auto" });
     titleRef.current?.focus({ preventScroll: true });
+    return () => overlay?.classList.remove("is-showing-results");
   }, []);
   return (
     <section className="results-shell" aria-labelledby="results-title" ref={resultsRef}>

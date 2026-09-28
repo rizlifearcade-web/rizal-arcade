@@ -62,7 +62,7 @@ test("roster serializes resets even when two clicks arrive before rerender", asy
   await resetButtons[0].props.onClick();
   assert.equal(ui.requests.length, 1);
   assert.equal(ui.requests[0].path, "/api/admin/reset-student-password");
-  assert.deepEqual(ui.requests[0].body, { studentId: "A" });
+  assert.deepEqual(ui.requests[0].body, { profileId: "A" });
   assert.ok(ui.render().buttons.filter((button) => typeof button.props.onClick === "function" && button.props.children !== "Delete…").some((button) => button.props.disabled));
 
   ui.requests[0].resolve(Response.json({ credential: { studentId: "A", displayName: "A", temporaryPassword: "test-password-a" } }));
@@ -74,10 +74,19 @@ test("roster serializes resets even when two clicks arrive before rerender", asy
   const second = completed.buttons.filter((button) => button.props.children === "Reset password")[1].props.onClick();
   await Promise.resolve();
   assert.equal(ui.requests.length, 2);
-  assert.deepEqual(ui.requests[1].body, { studentId: "B" });
+  assert.deepEqual(ui.requests[1].body, { profileId: "B" });
   ui.requests[1].resolve(Response.json({ credential: { studentId: "B", displayName: "B", temporaryPassword: "test-password-b" } }));
   await second;
   assert.equal(ui.render().codes[0].props.children, "test-password-b");
+});
+
+test("reset API accepts the roster profile UUID and does not hide lookup errors as missing students", () => {
+  const resetApi = readFileSync(new URL("../api/admin/reset-student-password.ts", import.meta.url), "utf8");
+  assert.match(resetApi, /profileId\?: unknown/);
+  assert.match(resetApi, /profileId \? profileQuery\.eq\("id", profileId\)/);
+  assert.match(resetApi, /profileQuery\.maybeSingle\(\)/);
+  assert.match(resetApi, /student account lookup failed/);
+  assert.doesNotMatch(resetApi, /section:rizal_arcade_sections/);
 });
 
 test("failed reset releases the guard and permits retry without showing a credential", async () => {

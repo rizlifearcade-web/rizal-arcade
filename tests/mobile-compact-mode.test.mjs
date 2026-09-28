@@ -81,6 +81,12 @@ test("the pre-game How to Play screen keeps its own scroll even on games that lo
   }
 });
 
+test("the shared results screen releases every mobile gameplay scroll lock", () => {
+  assert.match(shared, /classList\.add\("is-showing-results"\)/);
+  assert.match(shared, /classList\.remove\("is-showing-results"\)/);
+  assert.match(css, /\.game-overlay\.is-playing\.is-showing-results\s*\{[^}]*overflow-y:\s*auto/s);
+});
+
 test("Global Sojourn's on-map pins are locational reference only, not fiddly tap targets, on phones", () => {
   assert.match(css, /\.global-port, \.global-port-anchor \{ pointer-events: none; \}/);
 });
