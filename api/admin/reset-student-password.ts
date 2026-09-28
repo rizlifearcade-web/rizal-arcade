@@ -3,27 +3,37 @@ import { handleApiError, json, normalizeStudentId, requireAdmin, temporaryPasswo
 export async function POST(request: Request) {
   try {
     const { supabase } = await requireAdmin(request);
-    const body = await request.json() as { studentId?: unknown };
+    const body = await request.json() as { profileId?: unknown; studentId?: unknown };
+    const profileId = typeof body.profileId === "string" ? body.profileId.trim() : "";
     const studentId = typeof body.studentId === "string" ? normalizeStudentId(body.studentId) : "";
-    if (!studentId) return json({ error: "Enter a Student ID." }, 400);
-    const { data: profile, error } = await supabase
+    if (!profileId && !studentId) return json({ error: "Choose a student or enter a Student ID." }, 400);
+
+    let profileQuery = supabase
       .from("rizal_arcade_profiles")
-      .select("id,student_id,display_name,active,section:rizal_arcade_sections(section_code)")
-      .eq("student_id", studentId)
-      .eq("role", "student")
-      .single();
-    if (error || !profile) return json({ error: "No active student account matches that Student ID." }, 404);
+      .select("id,student_id,display_name,active,section_id")
+      .eq("role", "student");
+    profileQuery = profileId ? profileQuery.eq("id", profileId) : profileQuery.eq("student_id", studentId);
+    const { data: profile, error } = await profileQuery.maybeSingle();
+    if (error) throw new Error(`The student account lookup failed: ${error.message}`);
+    if (!profile) return json({ error: "No student account matches that Student ID." }, 404);
+
+    const { data: section, error: sectionError } = await supabase
+      .from("rizal_arcade_sections")
+      .select("section_code")
+      .eq("id", profile.section_id)
+      .maybeSingle();
+    if (sectionError) throw new Error(`The student's section could not be loaded: ${sectionError.message}`);
+
     const password = temporaryPassword();
     const { error: authError } = await supabase.auth.admin.updateUserById(profile.id, { password });
     if (authError) throw new Error(authError.message);
     const { error: profileError } = await supabase.from("rizal_arcade_profiles").update({ must_change_password: true, updated_at: new Date().toISOString() }).eq("id", profile.id);
     if (profileError) throw new Error(profileError.message);
-    const sectionValue = Array.isArray(profile.section) ? profile.section[0] : profile.section;
     return json({
       credential: {
         studentId: profile.student_id,
         displayName: profile.display_name,
-        sectionCode: sectionValue?.section_code ?? "",
+        sectionCode: section?.section_code ?? "",
         temporaryPassword: password,
       },
       message: `The old password has been replaced. Give this temporary password only to the student.${profile.active === false ? " The account remains inactive until you reactivate it." : ""}`,

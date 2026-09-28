@@ -222,7 +222,7 @@ function AdminSectionRoster({ sections }: { sections: AdminSection[] }) {
     mutationInFlight.current = true;
     setBusyId(student.id); setMessage(""); setRevealed(null);
     try {
-      const result = await adminRequest("/api/admin/reset-student-password", { studentId: student.student_id });
+      const result = await adminRequest("/api/admin/reset-student-password", { profileId: student.id });
       setRevealed(result.credential as Credential);
       setStudents((current) => current.map((item) => (item.id === student.id ? { ...item, must_change_password: true } : item)));
     } catch (error) { setMessage(error instanceof Error ? error.message : "The password could not be reset."); }
