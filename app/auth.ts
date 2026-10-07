@@ -50,6 +50,21 @@ export function studentLoginEmail(studentId: string) {
   return `${localPart}@students.rizal-arcade.invalid`;
 }
 
+async function resolveLoginEmail(identifier: string) {
+  const response = await fetch("/api/auth/resolve-login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier }),
+  });
+  const result = await response.json().catch(() => null) as { loginEmail?: unknown; error?: unknown } | null;
+  if (!response.ok || typeof result?.loginEmail !== "string") {
+    throw new Error(response.status >= 500
+      ? "The classroom login service is temporarily unavailable. Please try again."
+      : "The Student ID/email or password is incorrect.");
+  }
+  return result.loginEmail;
+}
+
 function normalizeSection(value: unknown): ArcadeSection | null {
   const section = Array.isArray(value) ? value[0] : value;
   if (!section || typeof section !== "object") return null;
@@ -112,11 +127,15 @@ export async function getAuthSnapshot(): Promise<ArcadeAuthSnapshot | null> {
 
 export async function signInToArcade(identifier: string, password: string) {
   const cleanIdentifier = identifier.trim();
-  const email = cleanIdentifier.includes("@") ? cleanIdentifier.toLowerCase() : studentLoginEmail(cleanIdentifier);
+  const email = cleanIdentifier.includes("@")
+    ? await resolveLoginEmail(cleanIdentifier)
+    : studentLoginEmail(cleanIdentifier);
   const { data, error } = await getSupabaseClient().auth.signInWithPassword({ email, password });
   if (error || !data.session) throw new Error("The Student ID/email or password is incorrect.");
   try {
-    return { session: data.session, profile: await loadProfile(data.session.user.id) };
+    const profile = await loadProfile(data.session.user.id);
+    if (!profile.active) throw new Error("This account is inactive. Ask the administrator to reactivate it.");
+    return { session: data.session, profile };
   } catch (profileError) {
     await getSupabaseClient().auth.signOut();
     throw profileError;
