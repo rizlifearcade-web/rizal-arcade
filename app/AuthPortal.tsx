@@ -39,9 +39,9 @@ export function LoginPortal({ onAuthenticated, onClose }: { onAuthenticated: (sn
         <div className="auth-badge">RA</div>
         <p className="eyebrow">Student entrance</p>
         <h2 id="login-title">Enter the arcade.</h2>
-        <p>Students use the credentials issued from their official class roster. The administrator signs in with an email address.</p>
+        <p>Students may use their Student ID or the official email in their class roster. Administrators use their admin email.</p>
         <form onSubmit={submit} className="auth-form">
-          <label>Student ID or admin email<input value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" /></label>
+          <label>Student ID or email<input value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" /></label>
           <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" /></label>
           <button className="button button-primary" type="submit" disabled={busy || !authConfigured}>{busy ? "Signing in…" : "Sign in"}</button>
         </form>
